@@ -6,7 +6,7 @@
 	{% for al in alternate_locales %}<link rel="alternate" hreflang="{{ al.lang }}" href="{{ al.link }}" />
 	{% endfor %}
 	{% if web_version %}
-	<title>LibreTranslate - {{ _h("Free and Open Source Machine Translation API") }}</title>
+	<title>Helsinki-MT - {{ _h("Freed and Open Source Machine Translation API") }}</title>
 	<meta name="description" content="{{ _h('Free and Open Source Machine Translation API. Self-hosted, offline capable and easy to setup. Run your own API server in just a few minutes.') }}">
 	<meta name="keywords" content="{{ _h('translation') }},{{ _h('api') }}">
 	{% endif %}
@@ -58,25 +58,25 @@
 				<button data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></button>
 				<a id="logo-container" href="/" class="brand-logo noline">
 					<img src="{{ url_for('static', filename='icon.svg') }}" alt="" class="logo">
-					<span>LibreTranslate</span>
+					<span>Helsinki-MT</span>
 				</a>
 				<ul id="nav" class="right hide-on-med-and-down top-nav position-relative">
 					{% set menulinks %}
-					<li><a href="{{ swagger_url }}">{{ _h("API Docs") }}</a></li>
+					<!-- <li><a href="{{ swagger_url }}">{{ _h("API Docs") }}</a></li>
 					{% if get_api_key_link %}
 					<li><a href="{{ get_api_key_link }}">{{ _h("Get API Key") }}</a></li>
 					{% endif %}
 					<li><a href="https://github.com/LibreTranslate/LibreTranslate" rel="noopener noreferrer">{{ _h("GitHub") }}</a></li>
 					{% if api_keys %}
 					<li><a class="noline" href="javascript:setApiKey()" title="{{ _h('Set API Key') }}" aria-label="{{ _h('Set API Key') }}"><i class="material-icons">vpn_key</i></a></li>
-					{% endif %}
+					{% endif %}-->
 					<li class="change-language"><a class="noline" href="javascript:void(0)" title="{{ _h('Change language') }}"><i class="material-icons">language</i></a>
 					</li>
 					<li class="locale-panel">
 						<select id="locales" onchange="changeLocale(this)">
 							{% for l in available_locales %}<option value="{{ l['code'] }}" {{ 'selected' if current_locale == l['code'] else ''}}>{{ l['name'] }}</option>{% endfor %}
 						</select>
-						<a href="https://hosted.weblate.org/projects/libretranslate/app/{{ current_locale }}/">{{ _h("Edit") }}<i class="material-icons">create</i></a>
+						<!--<a href="https://hosted.weblate.org/projects/libretranslate/app/{{ current_locale }}/">{{ _h("Edit") }}<i class="material-icons">create</i></a>-->
 					</li>
 					{% endset %}
 					{{ menulinks }}
@@ -122,7 +122,7 @@
 		</nav>
 	</header>
 
-	<main id="app">
+	<div v-cloak id="app">
 	<div class="section no-pad-bot center" v-if="loading">
 		<div class="container">
 			<div class="row">
@@ -168,11 +168,11 @@
 				<div class="row">
 					<h3 class="header center">{{ _h("Translation API") }}</h3>
 					<div id="translation-type-btns" class="s12 center" v-if="filesTranslation === true">
-						<button type="button" class="btn btn-switch-type" @click="switchType('text')" :class="{'active': translationType === 'text'}">
+						<button type="button" class="btn btn-switch-type" @click="switchType('text'); sourceLang = textSourceLang" :class="{'active': translationType === 'text'}">
 							<i aria-hidden="true" class="material-icons">title</i>
 							<span class="btn-text">{{ _h("Translate Text") }}</span>
 						</button>
-						<button type="button" class="btn btn-switch-type" @click="switchType('files')" :class="{'active': translationType === 'files'}">
+						<button type="button" class="btn btn-switch-type" @click="switchType('files'); textSourceLang = sourceLang; sourceLang = 'en'; detectedLangText = ''" :class="{'active': translationType === 'files'}">
 							<i aria-hidden="true" class="material-icons">description</i>
 							<span class="btn-text">{{ _h("Translate Files") }}</span>
 						</button>
@@ -184,7 +184,8 @@
 								<span v-if="detectedLangText !== ''">[[ detectedLangText ]]</span>
 								<select aria-labelledby="sourceLangLabel" class="browser-default" v-model="sourceLang" ref="sourceLangDropdown" @change="handleInput">
 									<template v-for="option in langs">
-										<option :value="option.code">[[ option.name ]]</option>
+										<option v-if="translationType === 'files' && option.code !== 'auto'" :value="option.code">[[ option.name ]]</option>
+										<option v-if="translationType === 'text'" :value="option.code">[[ option.name ]]</option>
 									</template>
 								</select>
 							</div>
@@ -324,7 +325,7 @@
 		</div>
 		{% endif %}
 	</div>
-	</main>
+	</div>
 
 	<footer class="page-footer">
 		<div class="container">

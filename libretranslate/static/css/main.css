@@ -18,7 +18,7 @@
     --border-color: #444;
     --fg-color: #fff;
   }
-
+  
   .token.atrule, .token.attr-value, .token.keyword {
     color: #40b5e8;
   }
@@ -477,3 +477,9 @@ code[class*="language-"], pre[class*="language-"] {
     display: none;
   }
 }
+
+
+[v-cloak] {
+	    display: none !important;
+  }
+
