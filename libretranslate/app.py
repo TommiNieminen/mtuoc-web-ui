@@ -1083,6 +1083,7 @@ def create_app(args):
     app.config["BABEL_TRANSLATION_DIRECTORIES"] = 'locales'
 
     def get_locale():
+        return "en"
         override_lang = request.headers.get('X-Override-Accept-Language')
         if override_lang and override_lang in get_available_locale_codes():
             return override_lang
