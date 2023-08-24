@@ -30,7 +30,7 @@ ARG models=""
 #RUN addgroup --system --gid 1032 libretranslate && adduser --system --uid 1032 libretranslate && mkdir -p /home/libretranslate/.local && chown -R libretranslate:libretranslate /home/libretranslate/.local
 USER root
 #RUN adduser --system --uid 1032 libretranslate && mkdir -p /home/libretranslate/.local && chown -R 1032:0 /home/libretranslate/.local
-RUN mkdir -p /opt/app-root/src/.local && chown -R 1032:0 /opt/app-root/src/.local
+RUN mkdir -p /opt/app-root/src/.local/share && chown -R 1032:0 /opt/app-root/src/.local/share
 #USER libretranslate
 
 
