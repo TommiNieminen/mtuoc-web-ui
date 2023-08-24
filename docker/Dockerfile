@@ -31,11 +31,11 @@ ARG models=""
 USER root
 #RUN adduser --system --uid 1032 libretranslate && mkdir -p /home/libretranslate/.local && chown -R 1032:0 /home/libretranslate/.local
 
-RUN mkdir -p /opt/app-root/src/.local/share/argos-translate && chown -R 1032:0 /opt/app-root/src/.local/share/argos-translate
+RUN mkdir -p /opt/app-root/src/.local && chown -R 1032:0 /opt/app-root/src/.local
 #USER libretranslate
 
-RUN chgrp -R 0 /opt/app-root/src/.local/share/argos-translate && \
-    chmod -R g=u /opt/app-root/src/.local/share/argos-translate
+RUN chgrp -R 0 /opt/app-root/src/.local && \
+    chmod -R g=u /opt/app-root/src/.local
 
 
 COPY --from=builder --chown=1032:0 /app /app
