@@ -13,7 +13,7 @@ services:
       test: ['CMD-SHELL', './venv/bin/python scripts/healthcheck.py']
     environment:
       - ARGOS_PACKAGES_DIR=./models
-      ## Uncomment above command and define your args if necessary
+      - PREFERRED_URL_SCHEME=https
     # command: --ssl --ga-id MY-GA-ID --req-limit 100 --char-limit 500
     ## Uncomment this section and the `volumes` section if you want to backup your API keys
     # environment:
