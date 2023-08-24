@@ -10,6 +10,9 @@ WORKDIR /app
 
 USER root
 
+RUN wget -O models.zip https://github.com/TommiNieminen/LibreTranslate/releases/download/models_v0.1/models.zip && \
+    unzip models.zip
+
 RUN python -mvenv venv && ./venv/bin/pip install --no-cache-dir --upgrade pip
 
 COPY . .
