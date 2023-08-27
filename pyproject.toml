@@ -32,6 +32,10 @@ classifiers = [
 ]
 dynamic = ["version"]
 
+# set this to true to allow github dependencies (argos-translate-files etc.)
+[tool.hatch.metadata]
+allow-direct-references = true
+
 dependencies = [
     "argostranslate ==1.8.0",
     "Flask ==2.2.2",
@@ -47,7 +51,7 @@ dependencies = [
     "appdirs ==1.4.4",
     "APScheduler ==3.9.1",
     "translatehtml ==1.5.2",
-    "argos-translate-files ==1.1.4",
+    "argos-translate-files@git+https://github.com/TommiNieminen/argos-translate-files",
     "itsdangerous ==2.1.2",
     "Werkzeug ==2.2.2",
     "requests ==2.28.1",
@@ -113,7 +117,6 @@ python = ["3.8", "3.9", "3.10", "3.11"]
 [tool.hatch.version]
 path = "VERSION"
 pattern = "^(?P<version>[0-9]*.[0-9]*.[0-9]*)$"
-
 
 [tool.pytest.ini_options]
 addopts = [

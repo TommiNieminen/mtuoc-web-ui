@@ -22,8 +22,9 @@ ENV LC_ALL C.UTF-8
 
 # Install package from source code, compile translations
 RUN ./venv/bin/pip install Babel==2.12.1 && ./venv/bin/python scripts/compile_locales.py \
-  && ./venv/bin/pip install torch --extra-index-url https://download.pytorch.org/whl/cpu \
-  && ./venv/bin/pip install .
+  && ./venv/bin/pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
+
+RUN ./venv/bin/pip install .
 
 FROM registry.access.redhat.com/ubi8/python-38
 
