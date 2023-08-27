@@ -33,8 +33,8 @@ classifiers = [
 dynamic = ["version"]
 
 # set this to true to allow github dependencies (argos-translate-files etc.)
-[tool.hatch.metadata]
-allow-direct-references = true
+#[tool.hatch.metadata]
+#allow-direct-references = true
 
 dependencies = [
     "argostranslate ==1.8.0",
@@ -46,12 +46,11 @@ dependencies = [
     "Flask-Session ==0.4.0",
     "waitress ==2.1.2",
     "expiringdict ==1.2.2",
-    " LTpycld2==0.42",
+    "LTpycld2 ==0.42",
     "morfessor ==2.0.6",
     "appdirs ==1.4.4",
     "APScheduler ==3.9.1",
     "translatehtml ==1.5.2",
-    "argos-translate-files@git+https://github.com/TommiNieminen/argos-translate-files",
     "itsdangerous ==2.1.2",
     "Werkzeug ==2.2.2",
     "requests ==2.28.1",
