@@ -6,8 +6,8 @@
 	{% for al in alternate_locales %}<link rel="alternate" hreflang="{{ al.lang }}" href="{{ al.link }}" />
 	{% endfor %}
 	{% if web_version %}
-	<title>Helsinki-MT - {{ _h("Freed and Open Source Machine Translation API") }}</title>
-	<meta name="description" content="{{ _h('Free and Open Source Machine Translation API. Self-hosted, offline capable and easy to setup. Run your own API server in just a few minutes.') }}">
+	<title>Kontra - {{ _h("University of Helsinki machine translation service") }}</title>
+	<meta name="description" content="{{ _h('FUniversity of Helsinki machine translation service') }}">
 	<meta name="keywords" content="{{ _h('translation') }},{{ _h('api') }}">
 	{% endif %}
 
@@ -28,7 +28,7 @@
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="https://libretranslate.com" />
 	<meta property="og:image" content="https://user-images.githubusercontent.com/1951843/102724116-32a6df00-42db-11eb-8cc0-129ab39cdfb5.png" />
-	<meta property="og:description" name="description" class="swiftype" content="{{ _h('Free and Open Source Machine Translation API. Self-hosted, offline capable and easy to setup. Run your own API server in just a few minutes.') }}"/>
+	<meta property="og:description" name="description" class="swiftype" content="{{ _h('University of Helsinki machine translation service') }}"/>
 
 	<script src="{{ url_for('static', filename='js/vue@2.js') }}"></script>
 
@@ -57,8 +57,7 @@
 			<div class="nav-wrapper container">
 				<button data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></button>
 				<a id="logo-container" href="/" class="brand-logo noline">
-					<img src="{{ url_for('static', filename='icon.svg') }}" alt="" class="logo">
-					<span>Helsinki-MT</span>
+					<span>Kontra</span>
 				</a>
 				<ul id="nav" class="right hide-on-med-and-down top-nav position-relative">
 					{% set menulinks %}
@@ -166,7 +165,7 @@
 		<div class="section no-pad-bot">
 			<div class="container">
 				<div class="row">
-					<h3 class="header center">{{ _h("Translation API") }}</h3>
+					<h4 class="header center">{{ _h("University of Helsinki Machine Translation Service") }}</h3>
 					<div id="translation-type-btns" class="s12 center" v-if="filesTranslation === true">
 						<button type="button" class="btn btn-switch-type" @click="switchType('text'); sourceLang = textSourceLang" :class="{'active': translationType === 'text'}">
 							<i aria-hidden="true" class="material-icons">title</i>

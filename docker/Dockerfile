@@ -20,7 +20,8 @@ ENV LC_ALL C.UTF-8
 
 RUN ./venv/bin/pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
 
-RUN ./venv/bin/pip install torch "argos-translate-files @ git+https://@github.com/TommiNieminen/argos-translate-files.git@main"
+RUN ./venv/bin/pip install "argostranslate @ git+https://github.com/TommiNieminen/argos-translate.git@master"
+RUN ./venv/bin/pip install "argos-translate-files @ git+https://github.com/TommiNieminen/argos-translate-files.git@main"
 
 COPY . .
 
@@ -58,4 +59,4 @@ RUN if [ "$with_models" = "true" ]; then  \
   fi
 
 EXPOSE 5000
-ENTRYPOINT [ "./venv/bin/libretranslate", "--host", "0.0.0.0" ]
+ENTRYPOINT [ "./venv/bin/libretranslate", "--host", "0.0.0.0", "--char-limit=10000" ]
