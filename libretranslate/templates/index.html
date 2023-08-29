@@ -64,8 +64,8 @@
 					<!-- <li><a href="{{ swagger_url }}">{{ _h("API Docs") }}</a></li>
 					{% if get_api_key_link %}
 					<li><a href="{{ get_api_key_link }}">{{ _h("Get API Key") }}</a></li>
+					<li><a href="https://github.com/TommiNieminen/LibreTranslate" rel="noopener noreferrer">{{ _h("GitHub") }}</a></li>
 					{% endif %}
-					<li><a href="https://github.com/LibreTranslate/LibreTranslate" rel="noopener noreferrer">{{ _h("GitHub") }}</a></li>
 					{% if api_keys %}
 					<li><a class="noline" href="javascript:setApiKey()" title="{{ _h('Set API Key') }}" aria-label="{{ _h('Set API Key') }}"><i class="material-icons">vpn_key</i></a></li>
 					{% endif %}-->
@@ -165,7 +165,7 @@
 		<div class="section no-pad-bot">
 			<div class="container">
 				<div class="row">
-					<h4 class="header center">{{ _h("University of Helsinki Machine Translation Service") }}</h3>
+					<h5 class="header center">{{ _h("University of Helsinki Machine Translation Service") }}</h5>
 					<div id="translation-type-btns" class="s12 center" v-if="filesTranslation === true">
 						<button type="button" class="btn btn-switch-type" @click="switchType('text'); sourceLang = textSourceLang" :class="{'active': translationType === 'text'}">
 							<i aria-hidden="true" class="material-icons">title</i>
@@ -270,7 +270,7 @@
 											</div>
 										</div>
 									</div>
-									<button @click="translateFile" v-if="translatedFileUrl === false && loadingFileTranslation === false" class="btn">{{ _h("Translate") }}</button>
+									<button @click="translateFile" v-if="translatedFileUrl === false && loadingFileTranslation === false && sourceLang != targetLang" class="btn">{{ _h("Translate") }}</button>
 									<a v-if="translatedFileUrl !== false" :href="translatedFileUrl" class="btn">{{ _h("Download") }}</a>
 									<div class="progress" v-if="loadingFileTranslation">
 										<div class="indeterminate"></div>

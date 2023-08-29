@@ -204,6 +204,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 this.updateQueryParam('target', this.targetLang)
                 this.updateQueryParam('q', this.inputText)
 
+
                 if (this.timeout) clearTimeout(this.timeout);
                 this.timeout = null;
 
@@ -247,7 +248,11 @@ document.addEventListener('DOMContentLoaded', function(){
                             var res = JSON.parse(this.response);
                             // Success!
                             if (res.translatedText !== undefined){
-                                self.translatedText = res.translatedText;
+				if (self.sourceLang === self.targetLang || (typeof res.detectedLanguage !== 'undefined' && res.detectedLanguage.language === self.targetLang)){
+                                    self.translatedText = "";
+				} else{
+                                    self.translatedText = res.translatedText;
+				}
                                 self.loadingTranslation = false;
                                 self.output = JSON.stringify(res, null, 4);
                                 if(self.sourceLang == "auto" && res.detectedLanguage !== undefined){
