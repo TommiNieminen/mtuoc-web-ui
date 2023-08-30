@@ -10,9 +10,6 @@ WORKDIR /app
 
 USER root
 
-RUN wget -nv -O models.zip https://github.com/TommiNieminen/LibreTranslate/releases/download/models_v0.1/models.zip && \
-    unzip models.zip
-
 RUN python -mvenv venv && ./venv/bin/pip install --no-cache-dir --upgrade pip
 
 ENV LANG C.UTF-8
@@ -25,13 +22,12 @@ RUN ./venv/bin/pip install "argos-translate-files @ git+https://github.com/Tommi
 
 COPY . .
 
+RUN unzip models.zip
+
 # Install package from source code, compile translations
 RUN ./venv/bin/pip install Babel==2.12.1 && ./venv/bin/python scripts/compile_locales.py && ./venv/bin/pip install .
 
 FROM registry.access.redhat.com/ubi8/python-38
-
-ARG with_models=false
-ARG models=""
 
 #RUN addgroup --system --gid 1032 libretranslate && adduser --system --uid 1032 libretranslate && mkdir -p /home/libretranslate/.local && chown -R libretranslate:libretranslate /home/libretranslate/.local
 USER root
@@ -48,15 +44,6 @@ RUN chgrp -R 0 /app && \
     chmod -R g=u /app
 
 WORKDIR /app
-
-RUN if [ "$with_models" = "true" ]; then  \
-  # initialize the language models
-  if [ ! -z "$models" ]; then \
-  ./venv/bin/python scripts/install_models.py --load_only_lang_codes "$models";   \
-  else \
-  ./venv/bin/python scripts/install_models.py;  \
-  fi \
-  fi
 
 EXPOSE 5000
 ENTRYPOINT [ "./venv/bin/libretranslate", "--host", "0.0.0.0", "--char-limit=10000" ]
