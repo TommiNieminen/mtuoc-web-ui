@@ -449,11 +449,11 @@ function handleLangsResponse(self, response) {
     if (response.status >= 200 && response.status < 400) {
         self.langs = JSON.parse(response.response);
 
-        if (self.langs.length === 0){
+        /*if (self.langs.length === 0){
             self.loading = false;
             self.error = {{ _e("No languages available. Did you install the models correctly?") }};
             return;
-        }
+        }*/
 
         self.langs.push({ name: {{ _e("Auto Detect") }}, code: "auto", targets: self.langs.map(l => l.code)})
 

@@ -15,13 +15,11 @@ from flask_babel import Babel
 from flask_session import Session
 from flask_swagger import swagger
 from flask_swagger_ui import get_swaggerui_blueprint
-from translatehtml import translate_html
 from werkzeug.exceptions import HTTPException
 from werkzeug.http import http_date
 from werkzeug.utils import secure_filename
 
 from libretranslate import flood, remove_translated_files, scheduler, secret, security, storage
-from libretranslate.language import detect_languages, improve_translation_formatting
 from libretranslate.locales import (
     _,
     _lazy,
@@ -123,11 +121,6 @@ def get_routes_limits(default_req_limit, daily_req_limit, api_keys_db):
 
 
 def create_app(args):
-    from libretranslate.init import boot
-
-    boot(args.load_only, args.update_models)
-
-    from libretranslate.language import load_languages
 
     swagger_url = args.url_prefix + "/docs"  # Swagger UI (w/o trailing '/')
     api_url = args.url_prefix + "/spec"
@@ -138,10 +131,6 @@ def create_app(args):
 
     if not args.disable_files_translation:
         remove_translated_files.setup(get_upload_dir())
-    languages = load_languages()
-    language_pairs = {}
-    for lang in languages:
-        language_pairs[lang.code] = sorted([l.to_lang.code for l in lang.translations_from])
 
     # Map userdefined frontend languages to argos language object.
     if args.frontend_language_source == "auto":
@@ -157,9 +146,8 @@ def create_app(args):
         frontend_argos_language_source = languages[0]
 
 
-    language_target_fallback = languages[1] if len(languages) >= 2 else languages[0]
 
-    if args.frontend_language_target == "locale":
+    """if args.frontend_language_target == "locale":
       def resolve_language_locale():
           loc = get_locale()
           language_target = next(
@@ -177,7 +165,7 @@ def create_app(args):
       if language_target is None:
         language_target = language_target_fallback
       frontend_argos_language_target = lambda: language_target
-
+    """
     frontend_argos_supported_files_format = []
 
     for file_format in get_supported_formats():
@@ -393,7 +381,8 @@ def create_app(args):
                       type: string
                     description: Supported target language codes
         """
-        return jsonify([{"code": l.code, "name": _lazy(l.name), "targets": language_pairs.get(l.code, [])} for l in languages])
+        #return jsonify([{"code": l.code, "name": _lazy(l.name), "targets": language_pairs.get(l.code, [])} for l in languages])
+        return jsonify([])
 
     # Add cors
     @bp.after_request
@@ -954,7 +943,7 @@ def create_app(args):
                           type: string
                           description: Human-readable language name (in English)
         """
-        target_lang = frontend_argos_language_target()
+        #target_lang = frontend_argos_language_target()
 
         return jsonify(
             {
@@ -967,12 +956,12 @@ def create_app(args):
                 "supportedFilesFormat": [] if args.disable_files_translation else frontend_argos_supported_files_format,
                 "language": {
                     "source": {
-                        "code": frontend_argos_language_source.code,
-                        "name": _lazy(frontend_argos_language_source.name),
+                        "code": None, #frontend_argos_language_source.code,
+                        "name": None #_lazy(frontend_argos_language_source.name),
                     },
                     "target": {
-                        "code": target_lang.code,
-                        "name": _lazy(target_lang.name),
+                        "code": None, #target_lang.code,
+                        "name": None #_lazy(target_lang.name),
                     },
                 },
             }
