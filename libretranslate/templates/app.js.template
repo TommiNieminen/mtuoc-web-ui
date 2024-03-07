@@ -231,8 +231,8 @@ document.addEventListener('DOMContentLoaded', function(){
                     //data.append("format", self.isHtml ? "html" : "text");
                     //data.append("api_key", localStorage.getItem("api_key") || "");
                     //if (self.apiSecret) data.append("secret", self.apiSecret);
-		    var url = self.mtSystem.ip + ":" + self.mtSystem.port + "/translate";
-                    request.open('POST',  + '/translate', true);
+		    var mtSystemUrl = self.mtSystem.host + ":" + self.mtSystem.port + "/translate";
+                    request.open('POST', mtSystemUrl, true);
 		    request.setRequestHeader("Content-Type", "application/json");
 		    var data = JSON.stringify({"src": self.inputText, "id": Date.now() + Math.random()});
                     request.onload = function() {

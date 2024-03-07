@@ -1,3 +1,7 @@
 - name: development tester
-  ip: 172.20.137.165
+  host: http://172.19.118.141
+  port: 8000
+- name: development tester old
+  host: http://172.20.137.165
   port: 8011
+
