@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function(){
             error: "",
             langs: [],
             settings: {},
-            sourceLang: "",
+            mtSystem: {},
             targetLang: "",
 
             loadingTranslation: false,
@@ -55,6 +55,8 @@ document.addEventListener('DOMContentLoaded', function(){
             settingsRequest.onload = function() {
                 if (this.status >= 200 && this.status < 400) {
                     self.settings = JSON.parse(this.response);
+		    self.mtSystems = self.settings.mtSystems;
+		    self.mtSystem = self.mtSystems[0];
                     self.sourceLang = self.settings.language.source.code;
                     self.targetLang = self.settings.language.target.code;
                     self.charactersLimit = self.settings.charLimit;
@@ -92,8 +94,7 @@ document.addEventListener('DOMContentLoaded', function(){
         updated: function(){
             if (this.isSuggesting) return;
 
-            M.FormSelect.init(this.$refs.sourceLangDropdown);
-            M.FormSelect.init(this.$refs.targetLangDropdown);
+            M.FormSelect.init(this.$refs.mtSystemDropdown);
 
             if (this.$refs.inputTextarea){
                 this.$refs.inputTextarea.focus()
@@ -111,14 +112,10 @@ document.addEventListener('DOMContentLoaded', function(){
             // Update "selected" attribute (to overcome a vue.js limitation)
             // but properly display checkmarks on supported browsers.
             // Also change the <select> width value depending on the <option> length
-            if (this.$refs.sourceLangDropdown) {
-                updateSelectedAttribute(this.$refs.sourceLangDropdown, this.sourceLang);
+            if (this.$refs.mtSystemDropdown) {
+                updateSelectedAttribute(this.$refs.mtSystemDropdown, this.mtSystem);
             }
-
-            if (this.$refs.targetLangDropdown) {
-                updateSelectedAttribute(this.$refs.targetLangDropdown, this.targetLang);
-            }
-        },
+       },
         computed: {
             requestCode: function(){
                 return ['const res = await fetch("' + this.BaseUrl + '/translate", {',
@@ -227,16 +224,17 @@ document.addEventListener('DOMContentLoaded', function(){
                     var request = new XMLHttpRequest();
                     self.transRequest = request;
 
-                    var data = new FormData();
-                    data.append("q", self.inputText);
-                    data.append("source", self.sourceLang);
-                    data.append("target", self.targetLang);
-                    data.append("format", self.isHtml ? "html" : "text");
-                    data.append("api_key", localStorage.getItem("api_key") || "");
-                    if (self.apiSecret) data.append("secret", self.apiSecret);
-
-                    request.open('POST', BaseUrl + '/translate', true);
-
+                    
+                    //data.append("src", self.inputText);
+                    //data.append("source", self.sourceLang);
+                    //data.append("target", self.targetLang);
+                    //data.append("format", self.isHtml ? "html" : "text");
+                    //data.append("api_key", localStorage.getItem("api_key") || "");
+                    //if (self.apiSecret) data.append("secret", self.apiSecret);
+		    var url = self.mtSystem.ip + ":" + self.mtSystem.port + "/translate";
+                    request.open('POST',  + '/translate', true);
+		    request.setRequestHeader("Content-Type", "application/json");
+		    var data = JSON.stringify({"src": self.inputText, "id": Date.now() + Math.random()});
                     request.onload = function() {
                         try{
                             {% if api_secret != "" %}
@@ -247,18 +245,10 @@ document.addEventListener('DOMContentLoaded', function(){
 
                             var res = JSON.parse(this.response);
                             // Success!
-                            if (res.translatedText !== undefined){
-				if (self.sourceLang === self.targetLang || (typeof res.detectedLanguage !== 'undefined' && res.detectedLanguage.language === self.targetLang)){
-                                    self.translatedText = "";
-				} else{
-                                    self.translatedText = res.translatedText;
-				}
+                            if (res.tgt !== undefined){
+                                self.translatedText = res.tgt;
                                 self.loadingTranslation = false;
                                 self.output = JSON.stringify(res, null, 4);
-                                if(self.sourceLang == "auto" && res.detectedLanguage !== undefined){
-                                    let lang = self.langs.find(l => l.code === res.detectedLanguage.language)
-                                    self.detectedLangText = ": " + (lang !== undefined ? lang.name : res.detectedLanguage.language) + " (" + res.detectedLanguage.confidence + "%)";
-                                }
                             } else{
                                 throw new Error(res.error || {{ _e("Unknown error") }});
                             }
@@ -496,11 +486,11 @@ function handleNotification(title, body) {
  * @param {object} langDropdown
  * @param {string} lang
  */
-function updateSelectedAttribute(langDropdown, lang) {
-    for (const child of langDropdown.children) {
-        if (child.value === lang){
+function updateSelectedAttribute(mtSystemDropdown, system) {
+    for (const child of mtSystemDropdown.children) {
+        if (child.value === system){
             child.setAttribute('selected', '');
-            langDropdown.style.width = getTextWidth(child.text) + 24 + 'px';
+            mtSystemDropdown.style.width = getTextWidth(child.text) + 24 + 'px';
         } else{
             child.removeAttribute('selected');
         }

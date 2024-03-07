@@ -171,20 +171,18 @@
 							<i aria-hidden="true" class="material-icons">title</i>
 							<span class="btn-text">{{ _h("Translate Text") }}</span>
 						</button>
-						<button type="button" class="btn btn-switch-type" @click="switchType('files'); textSourceLang = sourceLang; sourceLang = 'en'; detectedLangText = ''" :class="{'active': translationType === 'files'}">
+						<button type="button" class="btn btn-switch-type" @click="switchType('files');" :class="{'active': translationType === 'files'}">
 							<i aria-hidden="true" class="material-icons">description</i>
 							<span class="btn-text">{{ _h("Translate Files") }}</span>
 						</button>
 					</div>
 					<form id="translation-form" class="col s12">
 						<div class="row mb-0">
-							<div class="col s6 language-select">
-								<span id="sourceLangLabel">{{ _h("Machine translation system") }}</span>
-								<span v-if="detectedLangText !== ''">[[ detectedLangText ]]</span>
-								<select aria-labelledby="sourceLangLabel" class="browser-default" v-model="sourceLang" ref="sourceLangDropdown" @change="handleInput">
-									<template v-for="option in langs">
-										<option v-if="translationType === 'files' && option.code !== 'auto'" :value="option.code">[[ option.name ]]</option>
-										<option v-if="translationType === 'text'" :value="option.code">[[ option.name ]]</option>
+							<div class="col s6 system-select">
+								<span id="mtSystem">{{ _h("Machine translation system") }}</span>
+								<select aria-labelledby="mtSystemLabel" class="browser-default" v-model="mtSystem" ref="mtSystemDropdown" @change="handleInput">
+									<template v-for="option in mtSystems">
+										<option :value="option">[[ option.name ]]</option>
 									</template>
 								</select>
 							</div>

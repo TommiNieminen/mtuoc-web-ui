@@ -3,6 +3,7 @@ import os
 import re
 import tempfile
 import uuid
+import yaml
 from datetime import datetime
 from functools import wraps
 from html import unescape
@@ -945,6 +946,13 @@ def create_app(args):
         """
         #target_lang = frontend_argos_language_target()
 
+        
+        with open("mtSystems.yaml") as stream:
+            try:
+                mtSystems = yaml.safe_load(stream)
+            except yaml.YAMLError as exc:
+                print(exc)
+
         return jsonify(
             {
                 "charLimit": args.char_limit,
@@ -954,6 +962,7 @@ def create_app(args):
                 "suggestions": args.suggestions,
                 "filesTranslation": not args.disable_files_translation,
                 "supportedFilesFormat": [] if args.disable_files_translation else frontend_argos_supported_files_format,
+                "mtSystems": mtSystems,
                 "language": {
                     "source": {
                         "code": None, #frontend_argos_language_source.code,
