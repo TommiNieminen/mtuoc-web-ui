@@ -6,8 +6,8 @@
 	{% for al in alternate_locales %}<link rel="alternate" hreflang="{{ al.lang }}" href="{{ al.link }}" />
 	{% endfor %}
 	{% if web_version %}
-	<title>Kontra - {{ _h("University of Helsinki machine translation service") }}</title>
-	<meta name="description" content="{{ _h('FUniversity of Helsinki machine translation service') }}">
+	<title>{{ _h("MTUOC Web UI") }}</title>
+	<meta name="description" content="{{ _h('MTUOC Web UI') }}">
 	<meta name="keywords" content="{{ _h('translation') }},{{ _h('api') }}">
 	{% endif %}
 
@@ -24,11 +24,9 @@
 	<link rel="preload" href="{{ url_for('static', filename='css/prism.min.css') }}" as="style"/>
 	<link rel="preload" href="{{ url_for('static', filename='css/main.css') }}?v={{ version }}" as="style"/>
 
-	<meta property="og:title" content="LibreTranslate - {{ _h('Free and Open Source Machine Translation API') }}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="https://libretranslate.com" />
-	<meta property="og:image" content="https://user-images.githubusercontent.com/1951843/102724116-32a6df00-42db-11eb-8cc0-129ab39cdfb5.png" />
-	<meta property="og:description" name="description" class="swiftype" content="{{ _h('University of Helsinki machine translation service') }}"/>
+	<meta property="og:description" name="description" class="swiftype" content="{{ _h('MTUOC Web UI') }}"/>
 
 	<script src="{{ url_for('static', filename='js/vue@2.js') }}"></script>
 
@@ -57,25 +55,16 @@
 			<div class="nav-wrapper container">
 				<button data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></button>
 				<a id="logo-container" href="/" class="brand-logo noline">
-					<span>Kontra</span>
+					<span>MTUOC Web UI</span>
 				</a>
 				<ul id="nav" class="right hide-on-med-and-down top-nav position-relative">
 					{% set menulinks %}
-					<!-- <li><a href="{{ swagger_url }}">{{ _h("API Docs") }}</a></li>
-					{% if get_api_key_link %}
-					<li><a href="{{ get_api_key_link }}">{{ _h("Get API Key") }}</a></li>
-					<li><a href="https://github.com/TommiNieminen/LibreTranslate" rel="noopener noreferrer">{{ _h("GitHub") }}</a></li>
-					{% endif %}
-					{% if api_keys %}
-					<li><a class="noline" href="javascript:setApiKey()" title="{{ _h('Set API Key') }}" aria-label="{{ _h('Set API Key') }}"><i class="material-icons">vpn_key</i></a></li>
-					{% endif %}-->
 					<li class="change-language"><a class="noline" href="javascript:void(0)" title="{{ _h('Change language') }}"><i class="material-icons">language</i></a>
 					</li>
 					<li class="locale-panel">
 						<select id="locales" onchange="changeLocale(this)">
 							{% for l in available_locales %}<option value="{{ l['code'] }}" {{ 'selected' if current_locale == l['code'] else ''}}>{{ l['name'] }}</option>{% endfor %}
 						</select>
-						<!--<a href="https://hosted.weblate.org/projects/libretranslate/app/{{ current_locale }}/">{{ _h("Edit") }}<i class="material-icons">create</i></a>-->
 					</li>
 					{% endset %}
 					{{ menulinks }}
@@ -164,8 +153,8 @@
 	<div v-else>
 		<div class="section no-pad-bot">
 			<div class="container">
+				<h6 class="center">Translate text or files with MTUOC servers (select server from the drop-down below).</h6>
 				<div class="row">
-					<h5 class="header center">{{ _h("University of Helsinki Machine Translation Service") }}</h5>
 					<div id="translation-type-btns" class="s12 center" v-if="filesTranslation === true">
 						<button type="button" class="btn btn-switch-type" @click="switchType('text'); sourceLang = textSourceLang" :class="{'active': translationType === 'text'}">
 							<i aria-hidden="true" class="material-icons">title</i>
@@ -178,8 +167,8 @@
 					</div>
 					<form id="translation-form" class="col s12">
 						<div class="row mb-0">
-							<div class="col s6 system-select">
-								<span id="mtSystem">{{ _h("Machine translation system") }}</span>
+							<div class="col s12 system-select">
+								<span id="mtSystem">{{ _h("Select machine translation server to use:") }}</span>
 								<select aria-labelledby="mtSystemLabel" class="browser-default" v-model="mtSystem" ref="mtSystemDropdown" @change="handleInput">
 									<template v-for="option in mtSystems">
 										<option :value="option">[[ option.name ]]</option>
@@ -316,22 +305,11 @@
 	<footer class="page-footer">
 		<div class="container">
 			<div class="row">
-				<div class="col l12 s12">
-					<h5 class="white-text">{{ _h("Built on LibreTranslate") }}</h5>
-					<p class="grey-text text-lighten-4">{{ _h("Free and Open Source Machine Translation API") }}</p>
+				<div class="col l11 s12">
+					<p class="white-text">{{ _h("MTUOC Web UI is adapted from the %%(libre) UI. MTUOC Web UI is not officially associated with LibreTranslate or its products.", libre="<a class='white-text' href='https://github.com/LibreTranslate'>LibreTranslate</a>" ) }}</p>
 					<p>{{ _h("License:") }} <a class="grey-text text-lighten-4" href="https://www.gnu.org/licenses/agpl-3.0.en.html" rel="noopener noreferrer">AGPLv3</a></p>
-					{% if web_version %}
-					<p>
-						{{ _h("This public API should be used for testing, personal or infrequent use. If you're going to run an application in production, please %(host_server)s or %(get_api_key)s.", host_server='<a href="https://github.com/LibreTranslate/LibreTranslate" class="grey-text text-lighten-4" rel="noopener noreferrer">' + _h("host your own server") + '</a>', get_api_key='<a class="grey-text text-lighten-4" href="' + (get_api_key_link if get_api_key_link else "https://github.com/LibreTranslate/LibreTranslate#mirrors") + '" rel="noopener noreferrer">' + _h("get an API key") + '</a>') }}
-					</p>
-					{% endif %}
 				</div>
 			</div>
-		</div>
-		<div class="footer-copyright center">
-			<p class="white-text">
-				{{ _h("Made with %(heart)s by %(contributors)s and powered by %(engine)s", heart='❤', contributors='<a class="white-text" href="https://github.com/LibreTranslate/LibreTranslate/graphs/contributors" rel="noopener noreferrer">%s</a>' % _h("%(libretranslate)s Contributors", libretranslate="LibreTranslate"), engine='<a class="white-text text-lighten-3" href="https://github.com/argosopentech/argos-translate/" rel="noopener noreferrer">Argos Translate</a>') }}
-			</p>
 		</div>
 	</footer>
 
