@@ -46,6 +46,22 @@ def get_version():
     except:
         return "?"
 
+def translation_request(mt_system, text):
+    url = f'{mt_system["host"]}:{mt_system["port"]}/translate'
+    print(text)
+    payload = {
+      "src": text,
+      "id": random.randint(0,100000) #Change this to id with consistent length
+    }
+
+    headers = {
+      'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, json=payload)
+
+    translation = response.json().get("tgt")
+    return translation
 
 def get_upload_dir():
     upload_dir = os.path.join(tempfile.gettempdir(), "libretranslate-files-translate")
@@ -137,7 +153,7 @@ def create_app(args):
 
     mt_system_by_hash = {hashlib.md5((x["name"]+x["host"]+str(x["port"])).encode()).hexdigest(): x for x in mtSystems}
     mt_system_names_and_hashes = [{"name": mt_system_by_hash[k]["name"], "systemHash": k} for k in mt_system_by_hash.keys()]
-
+    print(mt_system_by_hash)
     bp = Blueprint('Main app', __name__)
 
     storage.setup(args.shared_storage)
@@ -599,20 +615,7 @@ def create_app(args):
 
         try:
             mt_system = mt_system_by_hash[mt_system_hash]
-            url = f'{mt_system["host"]}:{mt_system["port"]}/translate'
-
-            payload = {
-              "src": q,
-              "id": random.randint(0,100000) #Change this to id with consistent length
-            }
-
-            headers = {
-              'Content-Type': 'application/json'
-            }
-
-            response = requests.request("POST", url, headers=headers, json=payload)
-
-            translation = response.json().get("tgt")
+            translation = translation_request(mt_system, q)
 
             return jsonify(
               {
@@ -708,16 +711,17 @@ def create_app(args):
         if args.disable_files_translation:
             abort(403, description=_("Files translation are disabled on this server."))
 
+        mt_system_hash = request.form.get("mtSystemHash")
         source_lang = request.form.get("source")
         target_lang = request.form.get("target")
         file = request.files['file']
-
+        print(request.files)
         if not file:
             abort(400, description=_("Invalid request: missing %(name)s parameter", name='file'))
-        if not source_lang:
+        """if not source_lang:
             abort(400, description=_("Invalid request: missing %(name)s parameter", name='source'))
         if not target_lang:
-            abort(400, description=_("Invalid request: missing %(name)s parameter", name='target'))
+            abort(400, description=_("Invalid request: missing %(name)s parameter", name='target'))"""
 
         if file.filename == '':
             abort(400, description=_("Invalid request: empty file"))
@@ -725,25 +729,15 @@ def create_app(args):
         if os.path.splitext(file.filename)[1] not in frontend_argos_supported_files_format:
             abort(400, description=_("Invalid request: file format not supported"))
 
-        source_langs = [source_lang]
-        src_langs = [next(iter([l for l in languages if l.code == source_lang]), None) for source_lang in source_langs]
-
-        for idx, lang in enumerate(src_langs):
-            if lang is None:
-                abort(400, description=_("%(lang)s is not supported", lang=source_langs[idx]))
-
-        tgt_lang = next(iter([l for l in languages if l.code == target_lang]), None)
-
-        if tgt_lang is None:
-            abort(400, description=_("%(lang)s is not supported", lang=target_lang))
 
         try:
+            mt_system = mt_system_by_hash[mt_system_hash]
             filename = str(uuid.uuid4()) + '.' + secure_filename(file.filename)
             filepath = os.path.join(get_upload_dir(), filename)
-
+            print(filepath)
             file.save(filepath)
 
-            translated_file_path = argostranslatefiles.translate_file(src_langs[0].get_translation(tgt_lang), filepath)
+            translated_file_path = argostranslatefiles.translate_file(lambda x: translation_request(mt_system,x), filepath)
             translated_filename = os.path.basename(translated_file_path)
 
             return jsonify(

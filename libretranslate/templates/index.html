@@ -257,7 +257,7 @@
 											</div>
 										</div>
 									</div>
-									<button @click="translateFile" v-if="translatedFileUrl === false && loadingFileTranslation === false && sourceLang != targetLang" class="btn">{{ _h("Translate") }}</button>
+									<button @click="translateFile" v-if="translatedFileUrl === false && loadingFileTranslation === false" class="btn">{{ _h("Translate") }}</button>
 									<a v-if="translatedFileUrl !== false" :href="translatedFileUrl" class="btn">{{ _h("Download") }}</a>
 									<div class="progress" v-if="loadingFileTranslation">
 										<div class="indeterminate"></div>

@@ -367,6 +367,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 translateFileRequest.open("POST", BaseUrl + "/translate_file", true);
 
                 let data = new FormData();
+		data.append("mtSystemHash", self.mtSystem.systemHash)
                 data.append("file", this.inputFile);
                 data.append("source", this.sourceLang);
                 data.append("target", this.targetLang);

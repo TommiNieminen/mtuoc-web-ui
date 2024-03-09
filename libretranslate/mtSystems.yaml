@@ -7,3 +7,6 @@
 - name: development tester new
   host: http://172.19.126.141
   port: 8000
+- name: saturday development tester
+  host: http://172.20.137.165
+  port: 8011
