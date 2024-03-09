@@ -1,4 +1,4 @@
-from libretranslate import main
+from mtuocwebui import main
 
 
 def app(*args, **kwargs):

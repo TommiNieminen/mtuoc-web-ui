@@ -4,17 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 requires-python = ">=3.8"
-name = "libretranslate"
-description = "Free and Open Source Machine Translation API. Self-hosted, no limits, no ties to proprietary services."
+name = "mtuocwebui"
+description = "MTUOC Web UI."
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
-    { name = "Piero Toffanin", email = "pt@uav4geo.com" },
-    { name = "LibreTranslate Authors" },
+    { name = "Tommi Nieminen", email = "nieminentommi@hotmail.com" },
 ]
 maintainers = [
-    { name = "Piero Toffanin", email = "pt@uav4geo.com" },
-    { name = "LibreTranslate Authors" },
+    { name = "Tommi Nieminen", email = "nieminentommi@hotmail.com" },
 ]
 keywords = [
     "Python",
@@ -55,12 +53,13 @@ dependencies = [
     "requests ==2.28.1",
     "redis ==4.3.4",
     "prometheus-client ==0.15.0",
-    "polib ==1.1.1",
+    "polib ==1.1.1"
+    #"mtuoctranslatefiles @ https://github.com/TommiNieminen/mtuoc-translate-files.git"
 ]
 
 [project.scripts]
-libretranslate = "libretranslate.main:main"
-ltmanage = "libretranslate.manage:manage"
+mtuocwebui = "mtuocwebui.main:main"
+ltmanage = "mtuocwebui.manage:manage"
 
 
 [project.optional-dependencies]
@@ -73,11 +72,6 @@ test = [
 
 
 [project.urls]
-Homepage = "https://libretranslate.com"
-Source = "https://github.com/LibreTranslate/LibreTranslate"
-Documentation = "https://github.com/LibreTranslate/LibreTranslate"
-Tracker = "https://github.com/LibreTranslate/LibreTranslate/issues"
-History = "https://github.com/LibreTranslate/LibreTranslate/releases"
 
 
 # ENVIRONMENTS AND SCRIPTS
@@ -92,7 +86,6 @@ post-install-commands = [
 
 [tool.hatch.envs.default.scripts]
 dev = "python main.py {args}"
-locales = "python scripts/compile_locales.py"
 fmt = [
     "pre-commit run --all --all-files",
 ]
@@ -119,7 +112,7 @@ pattern = "^(?P<version>[0-9]*.[0-9]*.[0-9]*)$"
 [tool.pytest.ini_options]
 addopts = [
     "-v",
-    "--cov=libretranslate",
+    "--cov=mtuoc-web-ui",
     "--color=yes",
     "--cov-report=term-missing",
 ]
@@ -127,7 +120,6 @@ addopts = [
 
 # https://beta.ruff.rs/docs/rules
 [tool.ruff]
-src = ["libretranslate", "scripts"]
 target-version = "py38"
 line-length = 136
 select = [
