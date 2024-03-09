@@ -1,0 +1,12 @@
+- name: development tester
+  host: http://172.19.118.141
+  port: 8000
+- name: development tester old
+  host: http://172.20.137.165
+  port: 8011
+- name: development tester new
+  host: http://172.19.126.141
+  port: 8000
+- name: saturday development tester (a long description of the mt system here)
+  host: http://172.20.137.165
+  port: 8011
