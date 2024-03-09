@@ -4,10 +4,13 @@ import re
 import tempfile
 import uuid
 import yaml
+import requests
+import random
 from datetime import datetime
 from functools import wraps
 from html import unescape
 from timeit import default_timer
+import hashlib
 
 import argostranslatefiles
 from argostranslatefiles import get_supported_formats
@@ -125,6 +128,15 @@ def create_app(args):
 
     swagger_url = args.url_prefix + "/docs"  # Swagger UI (w/o trailing '/')
     api_url = args.url_prefix + "/spec"
+
+    with open("mtSystems.yaml") as stream:
+        try:
+            mtSystems = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+
+    mt_system_by_hash = {hashlib.md5((x["name"]+x["host"]+str(x["port"])).encode()).hexdigest(): x for x in mtSystems}
+    mt_system_names_and_hashes = [{"name": mt_system_by_hash[k]["name"], "systemHash": k} for k in mt_system_by_hash.keys()]
 
     bp = Blueprint('Main app', __name__)
 
@@ -418,6 +430,13 @@ def create_app(args):
             required: true
             description: Text(s) to translate
           - in: formData
+            name: mtSystemHash
+            schema:
+              type: string
+              example:  
+            required: true
+            description: Source language code
+          - in: formData
             name: source
             schema:
               type: string
@@ -502,21 +521,25 @@ def create_app(args):
         if request.is_json:
             json = get_json_dict(request)
             q = json.get("q")
+            mt_system_hash = json.get("mtSystemHash")
             source_lang = json.get("source")
             target_lang = json.get("target")
             text_format = json.get("format")
         else:
             q = request.values.get("q")
+            mt_system_hash = request.values.get("mtSystemHash")
             source_lang = request.values.get("source")
             target_lang = request.values.get("target")
             text_format = request.values.get("format")
 
         if not q:
             abort(400, description=_("Invalid request: missing %(name)s parameter", name='q'))
-        if not source_lang:
-            abort(400, description=_("Invalid request: missing %(name)s parameter", name='source'))
-        if not target_lang:
-            abort(400, description=_("Invalid request: missing %(name)s parameter", name='target'))
+        if not mt_system_hash:
+            abort(400, description=_("Invalid request: missing %(name)s parameter", name='mtSystemHash'))
+        #if not source_lang:
+        #    abort(400, description=_("Invalid request: missing %(name)s parameter", name='source'))
+        #if not target_lang:
+        #    abort(400, description=_("Invalid request: missing %(name)s parameter", name='target'))
 
         if not request.is_json:
             # Normalize line endings to UNIX style (LF) only so we can consistently
@@ -524,15 +547,6 @@ def create_app(args):
             # https://www.rfc-editor.org/rfc/rfc2046#section-4.1.1
             q = "\n".join(q.splitlines())
 
-        batch = isinstance(q, list)
-
-        if batch and args.batch_limit != -1:
-            batch_size = len(q)
-            if args.batch_limit < batch_size:
-                abort(
-                    400,
-                    description=_("Invalid request: request (%(size)s) exceeds text limit (%(limit)s)", size=batch_size, limit=args.batch_limit),
-                )
 
         if args.char_limit != -1:
             chars = sum([len(text) for text in q]) if batch else len(q)
@@ -542,7 +556,7 @@ def create_app(args):
                     400,
                     description=_("Invalid request: request (%(size)s) exceeds text limit (%(limit)s)", size=chars, limit=args.char_limit),
                 )
-
+        """
         if source_lang == "auto":
             source_langs = []
             auto_detect_texts = q if batch else [q]
@@ -576,7 +590,7 @@ def create_app(args):
 
         if tgt_lang is None:
             abort(400, description=_("%(lang)s is not supported",lang=target_lang))
-
+        """
         if not text_format:
             text_format = "text"
 
@@ -584,55 +598,26 @@ def create_app(args):
             abort(400, description=_("%(format)s format is not supported", format=text_format))
 
         try:
-            if batch:
-                results = []
-                for idx, text in enumerate(q):
-                    translator = src_langs[idx].get_translation(tgt_lang)
-                    if translator is None:
-                        abort(400, description=_("%(tname)s (%(tcode)s) is not available as a target language from %(sname)s (%(scode)s)", tname=_lazy(tgt_lang.name), tcode=tgt_lang.code, sname=_lazy(src_langs[idx].name), scode=src_langs[idx].code))
+            mt_system = mt_system_by_hash[mt_system_hash]
+            url = f'{mt_system["host"]}:{mt_system["port"]}/translate'
 
-                    if text_format == "html":
-                        translated_text = str(translate_html(translator, text))
-                    else:
-                        translated_text = improve_translation_formatting(text, translator.translate(text))
+            payload = {
+              "src": q,
+              "id": random.randint(0,100000) #Change this to id with consistent length
+            }
 
-                    results.append(unescape(translated_text))
-                if source_lang == "auto":
-                    return jsonify(
-                        {
-                            "translatedText": results,
-                            "detectedLanguage": source_langs
-                        }
-                    )
-                else:
-                    return jsonify(
-                          {
-                            "translatedText": results
-                          }
-                    )
-            else:
-                translator = src_langs[0].get_translation(tgt_lang)
-                if translator is None:
-                    abort(400, description=_("%(tname)s (%(tcode)s) is not available as a target language from %(sname)s (%(scode)s)", tname=_lazy(tgt_lang.name), tcode=tgt_lang.code, sname=_lazy(src_langs[0].name), scode=src_langs[0].code))
+            headers = {
+              'Content-Type': 'application/json'
+            }
 
-                if text_format == "html":
-                    translated_text = str(translate_html(translator, q))
-                else:
-                    translated_text = improve_translation_formatting(q, translator.translate(q))
+            response = requests.request("POST", url, headers=headers, json=payload)
 
-                if source_lang == "auto":
-                    return jsonify(
-                        {
-                            "translatedText": unescape(translated_text),
-                            "detectedLanguage": source_langs[0]
-                        }
-                    )
-                else:
-                    return jsonify(
-                        {
-                            "translatedText": unescape(translated_text)
-                        }
-                    )
+            translation = response.json().get("tgt")
+
+            return jsonify(
+              {
+                "translatedText": translation
+              })        
         except Exception as e:
             abort(500, description=_("Cannot translate text: %(text)s", text=str(e)))
 
@@ -944,14 +929,7 @@ def create_app(args):
                           type: string
                           description: Human-readable language name (in English)
         """
-        #target_lang = frontend_argos_language_target()
-
-        
-        with open("mtSystems.yaml") as stream:
-            try:
-                mtSystems = yaml.safe_load(stream)
-            except yaml.YAMLError as exc:
-                print(exc)
+        #target_lang = frontend_argos_language_target()        
 
         return jsonify(
             {
@@ -962,7 +940,7 @@ def create_app(args):
                 "suggestions": args.suggestions,
                 "filesTranslation": not args.disable_files_translation,
                 "supportedFilesFormat": [] if args.disable_files_translation else frontend_argos_supported_files_format,
-                "mtSystems": mtSystems,
+                "mtSystemsNamesAndHashes": mt_system_names_and_hashes,
                 "language": {
                     "source": {
                         "code": None, #frontend_argos_language_source.code,

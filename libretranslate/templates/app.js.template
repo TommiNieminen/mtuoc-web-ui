@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function(){
             settingsRequest.onload = function() {
                 if (this.status >= 200 && this.status < 400) {
                     self.settings = JSON.parse(this.response);
-		    self.mtSystems = self.settings.mtSystems;
+		    self.mtSystems = self.settings.mtSystemsNamesAndHashes;
 		    self.mtSystem = self.mtSystems[0];
                     self.sourceLang = self.settings.language.source.code;
                     self.targetLang = self.settings.language.target.code;
@@ -223,18 +223,15 @@ document.addEventListener('DOMContentLoaded', function(){
 
                     var request = new XMLHttpRequest();
                     self.transRequest = request;
-
-                    
-                    //data.append("src", self.inputText);
+                    var data = new FormData(); 
+                    data.append("q", self.inputText);
+		    data.append("mtSystemHash", self.mtSystem.systemHash)
                     //data.append("source", self.sourceLang);
                     //data.append("target", self.targetLang);
                     //data.append("format", self.isHtml ? "html" : "text");
                     //data.append("api_key", localStorage.getItem("api_key") || "");
                     //if (self.apiSecret) data.append("secret", self.apiSecret);
-		    var mtSystemUrl = self.mtSystem.host + ":" + self.mtSystem.port + "/translate";
-                    request.open('POST', mtSystemUrl, true);
-		    request.setRequestHeader("Content-Type", "application/json");
-		    var data = JSON.stringify({"src": self.inputText, "id": Date.now() + Math.random()});
+                    request.open('POST', BaseUrl + '/translate', true);
                     request.onload = function() {
                         try{
                             {% if api_secret != "" %}
@@ -245,8 +242,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
                             var res = JSON.parse(this.response);
                             // Success!
-                            if (res.tgt !== undefined){
-                                self.translatedText = res.tgt;
+                            if (res.translatedText !== undefined){
+                                self.translatedText = res.translatedText;
                                 self.loadingTranslation = false;
                                 self.output = JSON.stringify(res, null, 4);
                             } else{
