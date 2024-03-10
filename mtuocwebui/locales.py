@@ -10,7 +10,10 @@ from markupsafe import Markup, escape
 @lru_cache(maxsize=None)
 def get_available_locales(only_reviewed=True, sort_by_name=False):
     locales_dir = os.path.join(os.path.dirname(__file__), 'locales')
-    dirs = [os.path.join(locales_dir, d) for d in os.listdir(locales_dir)]
+    if os.path.exists(locales_dir):
+        dirs = [os.path.join(locales_dir, d) for d in os.listdir(locales_dir)]
+    else:
+        return []
 
     res = [{'code': 'en', 'name': 'English', 'reviewed': True}]
 
