@@ -10,6 +10,7 @@ from datetime import datetime
 from functools import wraps
 from html import unescape
 from timeit import default_timer
+import time
 import hashlib
 
 import mtuoctranslatefiles
@@ -35,8 +36,6 @@ from mtuocwebui.locales import (
     lazy_swag,
 )
 
-from .api_keys import Database, RemoteDatabase
-from .suggestions import Database as SuggestionsDatabase
 
 
 def get_version():
@@ -48,7 +47,6 @@ def get_version():
 
 def translation_request(mt_system, text):
     url = f'{mt_system["host"]}:{mt_system["port"]}/translate'
-    print(text)
     payload = {
       "src": text,
       "id": random.randint(0,100000) #Change this to id with consistent length
@@ -60,7 +58,15 @@ def translation_request(mt_system, text):
 
     response = requests.request("POST", url, headers=headers, json=payload)
 
-    translation = response.json().get("tgt")
+    #TODO: It seems that nested tags will cause a 500 response from MTUOC-server, so handle those
+    #by copying source with prefix, to help with debugging. Example of failure mode:
+    #<g id="1">but primarily, UniSport’s own terms of use are observed.<x id="2"/></g>
+    if response.status_code == 500:
+        print("translation request failed, inserting source")
+        #insert source
+        translation = "TRANSLATION FAILED: " + text
+    else:
+        translation = response.json().get("tgt")
     return translation
 
 def get_upload_dir():
@@ -583,7 +589,6 @@ def create_app(args):
         try:
             mt_system = mt_system_by_hash[mt_system_hash]
             translation = translation_request(mt_system, q)
-
             return jsonify(
               {
                 "translatedText": translation

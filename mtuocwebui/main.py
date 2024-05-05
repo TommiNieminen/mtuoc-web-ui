@@ -1,7 +1,6 @@
 import argparse
 import operator
 import sys
-
 from mtuocwebui.app import create_app
 from mtuocwebui.default_values import DEFAULT_ARGUMENTS as DEFARGS
 
@@ -178,7 +177,8 @@ def get_args():
         type=str,
         help="Add prefix to URL: example.com:5000/url-prefix/",
     )
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
+    #args = parser.parse_args()
     if args.url_prefix and not args.url_prefix.startswith('/'):
         args.url_prefix = '/' + args.url_prefix
     return args
@@ -192,10 +192,9 @@ def main():
         return app
     else:
         if args.debug:
-            app.run(host=args.host, port=args.port)
+            app.run(host=args.host, port=args.port, threaded=False)
         else:
             from waitress import serve
-
             url_scheme = "https" if args.ssl else "http"
             print(f"Running on {url_scheme}://{args.host}:{args.port}{args.url_prefix}")
 

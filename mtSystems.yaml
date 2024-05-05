@@ -1,0 +1,3 @@
+- name: development tester
+  host: http://172.20.137.165
+  port: 8000
