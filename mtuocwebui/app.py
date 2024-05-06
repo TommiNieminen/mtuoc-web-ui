@@ -706,10 +706,9 @@ def create_app(args):
             mt_system = mt_system_by_hash[mt_system_hash]
             filename = str(uuid.uuid4()) + '.' + secure_filename(file.filename)
             filepath = os.path.join(get_upload_dir(), filename)
-            print(filepath)
             file.save(filepath)
 
-            translated_file_path = mtuoctranslatefiles.translate_file(lambda x: translation_request(mt_system,x), filepath)
+            translated_file_path = mtuoctranslatefiles.translate_file(lambda x: translation_request(mt_system,x), filepath, mt_system["source_suffix"], mt_system["target_suffix"])
             translated_filename = os.path.basename(translated_file_path)
 
             return jsonify(
